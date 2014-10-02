@@ -16,3 +16,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+include_recipe 'build-essential'
+package 'libpcap'
+package 'libpcap-devel'
+
+directory node['arp-scan']['download_dir']
+
+remote_file "#{node['arp-scan']['download_dir']}/arp-scan-#{node['arp-scan']['version']}.tar.gz" do
+  source node['arp-scan']['download_url']
+  owner "root"
+  group "root"
+  mode "0644"
+end
+
+execute "extract_arp-scan_tarball" do
+  user "root"
+  cwd node['arp-scan']['download_dir']
+  command "tar zxf arp-scan-#{node['arp-scan']['version']}.tar.gz"
+  creates "arp-scan-#{node['arp-scan']['version']}"
+end
+
+bash "install_arp-scan" do
+  user "root"
+  cwd "#{node['arp-scan']['download_dir']}/arp-scan-#{node['arp-scan']['version']}"
+  code <<-EOH
+  ./configure --prefix=#{node['arp-scan']['prefix']}
+  make
+  make install
+  EOH
+  creates node['arp-scan']['prefix']
+end
+
