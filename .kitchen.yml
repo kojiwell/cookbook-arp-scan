@@ -1,16 +1,26 @@
 ---
-driver:
-  name: vagrant
+driver_plugin: digitalocean
+driver_config:
+  digitalocean_client_id: <%= ENV['DIGITALOCEAN_CLIENT_ID'] %>
+  digitalocean_api_key: <%= ENV['DIGITALOCEAN_API_KEY'] %>
+  ssh_key: <%= ENV['DIGITALOCEAN_SSH_KEY_PATH'] %>
+  ssh_key_ids: <%= ENV['DIGITALOCEAN_SSH_KEY_IDS'] %>
 
 provisioner:
   name: chef_solo
 
 platforms:
-  - name: ubuntu-12.04
-  - name: centos-6.4
+  - name: centos-6.5
+    driver_plugin: digitalocean
+    driver_config:
+      image_id: 6372108
 
 suites:
   - name: default
     run_list:
       - recipe[arp-scan::default]
+    attributes:
+  - name: modulefile
+    run_list:
+      - recipe[arp-scan::modulefile]
     attributes:
